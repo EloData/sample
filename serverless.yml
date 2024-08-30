@@ -1,0 +1,35 @@
+service: ${self:custom.serviceName}
+frameworkVersion: "3"
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  memorySize: 128
+  timeout: 3
+  deploymentBucket:
+    name: launchmotion-sls-functions
+
+functions:
+  read:
+    handler: src/main.read
+    description: Leitura de dados
+    events:
+      - httpApi:
+          method: GET
+          path: /read
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-dotenv
+  - serverless-deployment-bucket
+
+custom:
+  serviceName: ${env:SERVICE_NAME, 'default-service-name'}
+  webpack:
+    webpackConfig: "webpack.config.js"
+  serverless-offline:
+    useChildProcess: true
+    httpPort: 3000
